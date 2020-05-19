@@ -10,8 +10,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "npm run build && sls client deploy",
-    "eject": "react-scripts eject"
+    "deploy": "npm run build && sls client deploy"
   },
   "eslintConfig": {
     "extends": "react-app"
