@@ -1,0 +1,65 @@
+service: contactform
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-south-1
+  environment:
+    CONTACT_TOPIC_ARN:
+      Ref: contactformTopic
+    CONTACT_TABLE_NAME:
+      Ref: contactformTable
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sns:Publish"
+      Resource:
+        - Ref: contactformTopic
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+      Resource:
+        Fn::GetAtt:
+          - contactformTable
+          - Arn
+
+# package:
+#   exclude:
+#     - node_modules/**
+
+functions:
+  submitContactForm:
+    handler: handler.submitContactForm
+    events:
+      - http:
+          path: submitContactForm
+          method: post
+          cors: true
+  saveContactMessage:
+    handler: handler.saveContactMessage
+    events:
+      - sns:
+          arn:
+            Ref: contactformTopic
+          topicName: contactformTopic-${self:provider.stage}
+
+resources:
+  Resources:
+    contactformTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: "Ykumar.in Contact Form"
+        TopicName: contactformTopic-${self:provider.stage}
+
+    contactformTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

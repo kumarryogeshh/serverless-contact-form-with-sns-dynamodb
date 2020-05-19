@@ -1,0 +1,18 @@
+service: contactform
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-south-1
+
+package:
+  exclude:
+    - node_modules/**
+
+plugins:
+  - serverless-finch
+
+custom:
+  client:
+    bucketName: demo-contact-form-1605-2020
+    distributionFolder: build/
